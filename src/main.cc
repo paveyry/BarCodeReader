@@ -1,7 +1,9 @@
 #include <iostream>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
 #include "preprocess/grayscale.hh"
+#include "preprocess/blackhat.hh"
 
 int main(int argc, char *argv[])
 {
@@ -16,10 +18,11 @@ int main(int argc, char *argv[])
   // Preprocessing
   cv::Mat matrix = preprocess::grayscale(image);
 
-  cv::namedWindow("test");
-  cv::imshow("test", matrix);
-  cv::waitKey(0);
+  matrix = preprocess::blackhat(matrix);
 
+  cv::namedWindow("image");
+  cv::imshow("image", matrix);
+  cv::waitKey(0);
 
   return 0;
 }
