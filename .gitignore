@@ -32,3 +32,9 @@ build
 *.exe
 *.out
 *.app
+BarCodeReader
+
+# Images
+*.png
+*.jpg
+*.bmp
