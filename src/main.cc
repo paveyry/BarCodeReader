@@ -4,6 +4,7 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include "preprocess/grayscale.hh"
 #include "preprocess/blackhat.hh"
+#include "preprocess/threshold.hh"
 
 int main(int argc, char *argv[])
 {
@@ -17,9 +18,11 @@ int main(int argc, char *argv[])
 
   // Preprocessing
   cv::Mat matrix = preprocess::grayscale(image);
-
   matrix = preprocess::blackhat(matrix);
+  matrix = preprocess::threshold(matrix, 127);
 
+
+  cv::imwrite("output.png", matrix);
   cv::namedWindow("image");
   cv::imshow("image", matrix);
   cv::waitKey(0);
