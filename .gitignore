@@ -8,6 +8,10 @@
 *.gch
 *.pch
 
+# Clion files
+*.iml
+.idea/
+
 # Compiled Dynamic libraries
 *.so
 *.dylib
