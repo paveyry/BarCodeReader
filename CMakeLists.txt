@@ -1,9 +1,14 @@
-cmake_minimum_required(VERSION 3.5)
-project(BarCodeReader)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.3)
+PROJECT(BarCodeReader)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall -Wextra -pedantic")
+SET(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules" ${CMAKE_MODULE_PATH})
+FIND_PACKAGE(OpenCV 3 REQUIRED)
 
-file(GLOB_RECURSE SOURCES "src/*")
-include_directories("src")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall -Wextra -pedantic")
 
-add_executable(BarCodeReader ${SOURCES} src/main.cc)
+INCLUDE_DIRECTORIES("src ${OPENCV_INCLUDE_DIRS}")
+
+FILE(GLOB_RECURSE SOURCES "src/*")
+
+ADD_EXECUTABLE(BarCodeReader ${SOURCES} src/main.cc)
+TARGET_LINK_LIBRARIES(BarCodeReader ${OPENCV_LIBRARIES})
