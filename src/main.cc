@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
   // Preprocessing
   cv::Mat matrix = preprocess::grayscale(image);
   matrix = preprocess::blackhat(matrix);
-  matrix = preprocess::threshold(matrix, 127);
+  matrix = preprocess::threshold(matrix);
 
 
   cv::imwrite("output.png", matrix);

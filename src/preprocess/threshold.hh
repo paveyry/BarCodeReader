@@ -4,6 +4,6 @@
 
 namespace preprocess
 {
-  cv::Mat threshold(cv::Mat matrix, int threshold);
+  cv::Mat threshold(const cv::Mat& matrix);
 }
 
