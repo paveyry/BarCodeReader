@@ -5,6 +5,7 @@
 #include "preprocess/grayscale.hh"
 #include "preprocess/blackhat.hh"
 #include "preprocess/threshold.hh"
+#include "detection/longbarfilter.hh"
 
 int main(int argc, char *argv[])
 {
@@ -21,10 +22,17 @@ int main(int argc, char *argv[])
   matrix = preprocess::blackhat(matrix);
   matrix = preprocess::threshold(matrix);
 
+  // Find connected components bounding boxes and keep only the very long ones
+  detection::LongBarFilter lbfilter{matrix};
+  lbfilter.find_contours();
+  lbfilter.find_bounding_boxes();
+  lbfilter.filter_small_boxes();
+  lbfilter.draw_bounding_boxes(image, cv::Scalar(0, 0, 255));
 
-  cv::imwrite("output.png", matrix);
+
+  cv::imwrite("output.png", image);
   cv::namedWindow("image");
-  cv::imshow("image", matrix);
+  cv::imshow("image", image);
   cv::waitKey(0);
 
   return 0;
