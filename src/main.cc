@@ -6,6 +6,7 @@
 #include "preprocess/blackhat.hh"
 #include "preprocess/threshold.hh"
 #include "detection/longbarfilter.hh"
+#include "detection/barcodeextractor.hh"
 
 int main(int argc, char *argv[])
 {
@@ -32,6 +33,12 @@ int main(int argc, char *argv[])
   lbfilter.filter_small_boxes();
   lbfilter.draw_bounding_boxes(image, cv::Scalar(0, 0, 255));
   cv::imwrite("4_output_filtered_boxes.png", image);
+
+  // Extract barcode.
+  detection::BarCodeExtractor bce;
+  bce.process_segments(lbfilter.boxes_get());
+  bce.draw_segments(image, cv::Scalar(255, 255, 0));
+  cv::imwrite("5_output_filtered_boxes_with_segments.png", image);
 
   //cv::namedWindow("image");
   //cv::imshow("image", image);

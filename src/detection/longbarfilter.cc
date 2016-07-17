@@ -28,7 +28,7 @@ namespace detection
   {
     std::function<bool(cv::RotatedRect&)> predicate = [this](cv::RotatedRect& rect)
     {
-      return std::max(rect.size.height, rect.size.width) <= 10 * std::min(rect.size.height, rect.size.width)
+      return std::max(rect.size.height, rect.size.width) <= 7 * std::min(rect.size.height, rect.size.width)
              || std::max(rect.size.height, rect.size.width) < 20;
     };
     boxes_.erase(std::remove_if(boxes_.begin(), boxes_.end(), predicate), boxes_.end());
@@ -42,10 +42,7 @@ namespace detection
       rect.points(rect_points);
 
       for (int i = 0; i < 4; ++i)
-        cv::line(image, rect_points[i], rect_points[(i + 1) % 4], color, 2, 8);
+        cv::line(image, rect_points[i], rect_points[(i + 1) % 4], color, 1, 8);
     }
   }
-
-
-
 }
