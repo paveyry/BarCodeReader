@@ -5,6 +5,7 @@
 
 namespace preprocess
 {
+  // Threshold determined using Otsu's method
   cv::Mat threshold(const cv::Mat& matrix)
   {
     cv::Mat newmatrix(matrix.rows, matrix.cols, cv::DataType<uchar>::type);

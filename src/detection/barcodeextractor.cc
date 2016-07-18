@@ -9,6 +9,7 @@ namespace detection
 {
   BarCodeExtractor::BarCodeExtractor()
     : segments_{}
+    , segment_groups_{}
   {}
 
   void BarCodeExtractor::process_segments(const std::vector<cv::RotatedRect>& boxes)
@@ -41,5 +42,29 @@ namespace detection
       cv::line(mat, segment.first, segment.second, color, 1, 8);
   }
 
+  void BarCodeExtractor::find_neighbours()
+  {
+    for (auto& segment : segments_)
+    {
+      std::vector<segm_t> group;
+      group.push_back(segment);
 
+      for (auto& potential_neighb : segments_)
+      {
+        if (segment == potential_neighb)
+          continue;
+
+        double distance_first = misc::distance(segment.first, potential_neighb.first);
+        double distance_second = misc::distance(segment.second, potential_neighb.second);
+
+        if (std::abs(distance_first - distance_second) < 30
+            && distance_first < 50
+            && distance_second < 50)
+          group.push_back(potential_neighb);
+      }
+
+      if (group.size() > 1)
+        segment_groups_.push_back(std::move(group));
+    }
+  }
 }
