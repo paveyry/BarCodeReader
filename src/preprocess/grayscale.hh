@@ -4,5 +4,6 @@
 
 namespace preprocess
 {
+  // Apply grayscale to image and create matrix of uchar
   cv::Mat grayscale(const cv::Mat& image);
 }

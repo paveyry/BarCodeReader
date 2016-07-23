@@ -31,4 +31,5 @@ namespace detection
   {
     return boxes_;
   }
-}
+
+} // namespace detection

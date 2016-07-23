@@ -45,4 +45,5 @@ namespace detection
         cv::line(image, rect_points[i], rect_points[(i + 1) % 4], color, 1, 8);
     }
   }
-}
+
+} // namespace detection
