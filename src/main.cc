@@ -17,6 +17,7 @@ int main(int argc, char *argv[])
   }
 
   cv::Mat image = cv::imread(argv[1], CV_LOAD_IMAGE_COLOR);
+  cv::Mat image_copy = image.clone();
 
   // Preprocessing
   cv::Mat matrix = preprocess::grayscale(image);
@@ -35,10 +36,17 @@ int main(int argc, char *argv[])
   cv::imwrite("4_output_filtered_boxes.png", image);
 
   // Extract barcode.
-  detection::BarCodeExtractor bce;
-  bce.process_segments(lbfilter.boxes_get());
+  detection::BarCodeExtractor bce{lbfilter.boxes_get()};
+  bce.process_segments();
   bce.draw_segments(image, cv::Scalar(255, 255, 0));
   cv::imwrite("5_output_filtered_boxes_with_segments.png", image);
+  bce.find_neighbours();
+  bce.process_group_boxes();
+  bce.filter_group_boxes();
+  bce.draw_group_boxes(image, cv::Scalar(255, 0, 0), 3);
+  cv::imwrite("6_output_group_boxes.png", image);
+  size_t nbbarcodes = bce.group_boxes_get().size();
+  std::cout << nbbarcodes << " barcode" << (nbbarcodes <= 1 ? " was" : "s were") << " found." << std::endl;
 
   //cv::namedWindow("image");
   //cv::imshow("image", image);

@@ -8,16 +8,16 @@ namespace detection
   class BarCodeExtractor
   {
   public:
-    using segm_t = std::pair<cv::Point2f, cv::Point2f>;
+    using segm_t = std::tuple<cv::Point2f, cv::Point2f, cv::RotatedRect>;
     using comp_t = std::function<bool(const segm_t&, const segm_t&)>;
     using set_t = std::set<segm_t, comp_t>;
 
   public:
     // Constructor.
-    BarCodeExtractor();
+    BarCodeExtractor(const std::vector<cv::RotatedRect>& boxes);
 
     // Determine the middle segments of the bounding boxes
-    void process_segments(const std::vector<cv::RotatedRect>& boxes);
+    void process_segments();
 
     // Draw the middle segments on the image in parameters
     void draw_segments(cv::Mat& image, cv::Scalar color);
@@ -25,10 +25,26 @@ namespace detection
     // Find the groups of neighbour bounding boxes using the segments
     void find_neighbours();
 
+    // Determine the bounding box of each neighbour group
+    void process_group_boxes();
+
+    // Remove group boxes with wrong proportions.
+    void filter_group_boxes();
+
+    // Draw the group boxes on the image in parameters
+    void draw_group_boxes(cv::Mat& image, cv::Scalar color, int boldness);
+
+    // Getters
+    std::vector<cv::RotatedRect>& group_boxes_get();
+    const std::vector<cv::RotatedRect>& group_boxes_get() const;
+
   private:
+    const std::vector<cv::RotatedRect>& boxes_;
     std::vector<segm_t> segments_;
     comp_t comparator_;
     std::vector<set_t> segment_groups_;
-    std::vector<cv::RotatedRect> barcode
+    std::vector<cv::RotatedRect> group_boxes_;
   };
 }
+
+#include "barcodeextractor.hxx"
