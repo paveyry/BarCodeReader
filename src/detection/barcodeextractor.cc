@@ -5,10 +5,33 @@
 #include "barcodeextractor.hh"
 #include "../misc/distance.hh"
 
+
+namespace
+{
+  /**
+   * Return true if one element is common in the two sets
+   */
+  static bool is_common_elt_in_sets(const detection::BarCodeExtractor::set_t& s1,
+                                    const detection::BarCodeExtractor::set_t& s2)
+  {
+    for (auto& elt1 : s1)
+      for (auto& elt2 : s2)
+        if (elt1.first == elt2.first && elt1.second == elt2.second)
+          return true;
+    return false;
+  }
+
+} // Anonymous namespace
+
 namespace detection
 {
   BarCodeExtractor::BarCodeExtractor()
     : segments_{}
+    , comparator_{[](const segm_t& p1, const segm_t& p2)
+                  {
+                    return p1.first.x + p1.first.y + p1.second.x + p1.second.y
+                           < p2.first.x + p2.first.y + p2.second.x + p2.second.y;
+                  }}
     , segment_groups_{}
   {}
 
@@ -36,18 +59,19 @@ namespace detection
     }
   }
 
-  void BarCodeExtractor::draw_segments(cv::Mat& mat, cv::Scalar color)
+  void BarCodeExtractor::draw_segments(cv::Mat& image, cv::Scalar color)
   {
     for (auto& segment : segments_)
-      cv::line(mat, segment.first, segment.second, color, 1, 8);
+      cv::line(image, segment.first, segment.second, color, 1, 8);
   }
 
   void BarCodeExtractor::find_neighbours()
   {
+    // Find neighbour groups
     for (auto& segment : segments_)
     {
-      std::vector<segm_t> group;
-      group.push_back(segment);
+      set_t group{comparator_};
+      group.insert({segment});
 
       for (auto& potential_neighb : segments_)
       {
@@ -60,11 +84,29 @@ namespace detection
         if (std::abs(distance_first - distance_second) < 30
             && distance_first < 50
             && distance_second < 50)
-          group.push_back(potential_neighb);
+          group.insert({potential_neighb});
       }
 
-      if (group.size() > 1)
+      if (group.size() >= 2)
         segment_groups_.push_back(std::move(group));
     }
+
+    // Find groups with common elements and merge them
+    for (auto it1 = segment_groups_.begin(); it1 != segment_groups_.end(); ++it1)
+    {
+      for (auto it2 = segment_groups_.begin(); it2 != segment_groups_.end(); ++it2)
+      {
+        if (it1 == it2)
+          continue;
+
+        if (is_common_elt_in_sets(*it1, *it2))
+        {
+          it1->insert(it2->begin(), it2->end());
+          segment_groups_.erase(it2);
+        }
+      }
+    }
+
+
   }
-}
+} // namespace detection
