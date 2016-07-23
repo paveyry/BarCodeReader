@@ -136,10 +136,15 @@ namespace detection
       if (group.size() < 6)
         continue;
 
-      // Store all the segment points in a temp vector
+      // Store all the points in a temp vector
       std::vector<cv::Point2f> points;
-      for (auto& segment : group)
-        points.insert(points.end(), {std::get<0>(segment), std::get<1>(segment)});
+      for (auto& elt : group)
+      {
+        cv::Point2f p[4];
+        std::get<2>(elt).points(p);
+        for (int i = 0; i < 4; ++i)
+          points.push_back(p[i]);
+      }
 
       // Determine the minimum area rectangle of the points
       cv::RotatedRect rect = cv::minAreaRect(points);
@@ -152,11 +157,6 @@ namespace detection
   {
     for (auto it = group_boxes_.begin(); it != group_boxes_.end();)
     {
-      if (it->size.width > it->size.height)
-        it->size.width *= 1.03;
-      else
-        it->size.height *= 1.03;
-
       // Remove elements with height lower than (width / 7)
       if (std::min(it->size.width, it->size.height) < std::max(it->size.width, it->size.height) / 7.0)
         it = group_boxes_.erase(it);

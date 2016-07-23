@@ -43,8 +43,8 @@ int main(int argc, char *argv[])
   bce.find_neighbours();
   bce.process_group_boxes();
   bce.filter_group_boxes();
-  bce.draw_group_boxes(image, cv::Scalar(255, 0, 0), 3);
-  cv::imwrite("6_output_group_boxes.png", image);
+  bce.draw_group_boxes(image_copy, cv::Scalar(0, 0, 255), 3);
+  cv::imwrite("6_output_detected_bar_codes.png", image_copy);
   size_t nbbarcodes = bce.group_boxes_get().size();
   std::cout << nbbarcodes << " barcode" << (nbbarcodes <= 1 ? " was" : "s were") << " found." << std::endl;
 
