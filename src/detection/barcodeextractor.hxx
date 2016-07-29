@@ -14,4 +14,16 @@ namespace detection
   {
     return group_boxes_;
   }
+
+  inline
+  std::vector<cv::Mat>& BarCodeExtractor::barcodes_get()
+  {
+    return barcodes_;
+  }
+
+  inline
+  const std::vector<cv::Mat>& BarCodeExtractor::barcodes_get() const
+  {
+    return barcodes_;
+  }
 }

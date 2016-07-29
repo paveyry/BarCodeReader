@@ -4,6 +4,8 @@
 
 #include "barcodeextractor.hh"
 #include "../misc/distance.hh"
+#include "../misc/rotation.hh"
+#include "../preprocess/threshold.hh"
 
 
 namespace
@@ -25,8 +27,9 @@ namespace
 
 namespace detection
 {
-  BarCodeExtractor::BarCodeExtractor(const std::vector<cv::RotatedRect>& boxes)
-    : boxes_{boxes}
+  BarCodeExtractor::BarCodeExtractor(cv::Mat mat, const std::vector<cv::RotatedRect>& boxes)
+    : matrix_{mat}
+    , boxes_{boxes}
     , segments_{}
     , comparator_{[](const segm_t& p1, const segm_t& p2)
                   {
@@ -35,6 +38,7 @@ namespace detection
                   }}
     , segment_groups_{}
     , group_boxes_{}
+    , barcodes_{}
   {}
 
   void BarCodeExtractor::process_segments()
@@ -174,6 +178,34 @@ namespace detection
 
       for (int i = 0; i < 4; ++i)
         cv::line(image, rect_points[i], rect_points[(i + 1) % 4], color, boldness, 8);
+    }
+  }
+
+  void BarCodeExtractor::extract_barcodes()
+  {
+    for (auto& rect : group_boxes_)
+    {
+      // Calculate a rotation matrix to apply the transform
+      cv::Mat rotation_mat = cv::getRotationMatrix2D(rect.center, rect.angle, 1.0);
+
+      // Rotate the complete image using the rotation matrix
+      cv::Mat rotated_matrix;
+      cv::warpAffine(matrix_, rotated_matrix, rotation_mat, matrix_.size(), cv::INTER_LINEAR);
+
+      // Extract the concerned rectangle in a new Matrix
+      cv::Mat extracted;
+      cv::getRectSubPix(rotated_matrix, rect.size, rect.center, extracted);
+
+      // If our barcode is vertical, make it horizontal
+      if (extracted.rows > extracted.cols)
+        extracted = misc::rotation90(extracted);
+
+      // Reapply threshold (because we extracted a part of the grayscaled image)
+      extracted = preprocess::threshold(extracted);
+
+      cv::imwrite("test1.png", extracted);
+      // Store the barcode
+      barcodes_.push_back(extracted);
     }
   }
 } // namespace detection

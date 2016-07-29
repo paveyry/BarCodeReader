@@ -14,7 +14,7 @@ namespace detection
 
   public:
     // Constructor.
-    BarCodeExtractor(const std::vector<cv::RotatedRect>& boxes);
+    BarCodeExtractor(cv::Mat mat, const std::vector<cv::RotatedRect>& boxes);
 
     // Determine the middle segments of the bounding boxes
     void process_segments();
@@ -34,16 +34,22 @@ namespace detection
     // Draw the group boxes on the image in parameters
     void draw_group_boxes(cv::Mat& image, cv::Scalar color, int boldness);
 
+    void extract_barcodes();
+
     // Getters
     std::vector<cv::RotatedRect>& group_boxes_get();
     const std::vector<cv::RotatedRect>& group_boxes_get() const;
+    std::vector<cv::Mat>& barcodes_get();
+    const std::vector<cv::Mat>& barcodes_get() const;
 
   private:
+    cv::Mat matrix_;
     const std::vector<cv::RotatedRect>& boxes_;
     std::vector<segm_t> segments_;
     comp_t comparator_;
     std::vector<set_t> segment_groups_;
     std::vector<cv::RotatedRect> group_boxes_;
+    std::vector<cv::Mat> barcodes_;
   };
 }
 
