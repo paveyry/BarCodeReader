@@ -7,6 +7,7 @@
 #include "preprocess/threshold.hh"
 #include "detection/longbarfilter.hh"
 #include "detection/barcodeextractor.hh"
+#include "decoding/decoder.hh"
 
 int main(int argc, char *argv[])
 {
@@ -49,6 +50,9 @@ int main(int argc, char *argv[])
   size_t nbbarcodes = bce.group_boxes_get().size();
   std::cout << nbbarcodes << " barcode" << (nbbarcodes <= 1 ? " was" : "s were") << " found." << std::endl;
   bce.extract_barcodes();
+
+  decoding::Decoder decoder{bce.barcodes_get()};
+  decoder.decode();
 
   //cv::namedWindow("image");
   //cv::imshow("image", image);
