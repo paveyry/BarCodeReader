@@ -1,5 +1,5 @@
 #pragma once
-#include "barcodeextractor.hh"
+#include "barcode-extractor.hh"
 
 namespace detection
 {

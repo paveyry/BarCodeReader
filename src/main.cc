@@ -5,8 +5,8 @@
 #include "preprocess/grayscale.hh"
 #include "preprocess/blackhat.hh"
 #include "preprocess/threshold.hh"
-#include "detection/longbarfilter.hh"
-#include "detection/barcodeextractor.hh"
+#include "detection/long-bar-filter.hh"
+#include "detection/barcode-extractor.hh"
 #include "decoding/decoder.hh"
 
 int main(int argc, char *argv[])
@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
   cv::imwrite("1_output_gray.png", matrix);
   matrix = preprocess::blackhat(matrix);
   cv::imwrite("2_output_blackhat.png", matrix);
-  matrix = preprocess::threshold(matrix);
+  matrix = preprocess::threshold_otsu(matrix);
   cv::imwrite("3_output_binary.png", matrix);
 
   // Find connected components bounding boxes and keep only the very long ones
@@ -52,7 +52,11 @@ int main(int argc, char *argv[])
   bce.extract_barcodes();
 
   decoding::Decoder decoder{bce.barcodes_get()};
-  decoder.decode();
+  std::vector<std::string> codes = decoder.decode();
+  for (const auto& code : codes)
+  {
+    std::cout << code << std::endl;
+  }
 
   //cv::namedWindow("image");
   //cv::imshow("image", image);

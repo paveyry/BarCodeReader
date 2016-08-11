@@ -38,4 +38,4 @@ namespace detection
   };
 }
 
-#include "longbarfilter.hxx"
+#include "long-bar-filter.hxx"

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "longbarfilter.hh"
+#include "long-bar-filter.hh"
 
 namespace detection
 {

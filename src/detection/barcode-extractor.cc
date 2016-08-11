@@ -2,7 +2,7 @@
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 
-#include "barcodeextractor.hh"
+#include "barcode-extractor.hh"
 #include "../misc/distance.hh"
 #include "../misc/rotation.hh"
 #include "../preprocess/threshold.hh"
@@ -201,7 +201,7 @@ namespace detection
         extracted = misc::rotation90(extracted);
 
       // Reapply threshold (because we extracted a part of the grayscaled image)
-      extracted = preprocess::threshold(extracted);
+      extracted = preprocess::threshold_otsu(extracted);
 
       cv::imwrite("test1.png", extracted);
       // Store the barcode

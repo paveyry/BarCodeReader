@@ -53,4 +53,4 @@ namespace detection
   };
 }
 
-#include "barcodeextractor.hxx"
+#include "barcode-extractor.hxx"

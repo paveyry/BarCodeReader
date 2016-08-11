@@ -5,9 +5,26 @@
 
 namespace preprocess
 {
-  cv::Mat threshold(const cv::Mat& matrix)
+  cv::Mat binarize(const cv::Mat& matrix, int threshold)
   {
     cv::Mat newmatrix(matrix.rows, matrix.cols, cv::DataType<uchar>::type);
+
+    for (int i = 0; i < matrix.rows; ++i)
+    {
+      for (int j = 0; j < matrix.cols; ++j)
+      {
+        if (matrix.at<uchar>(i, j) < threshold)
+          newmatrix.at<uchar>(i, j) = 0;
+        else
+          newmatrix.at<uchar>(i, j) = 255;
+      }
+    }
+
+    return newmatrix;
+  }
+
+  cv::Mat threshold_otsu(const cv::Mat& matrix)
+  {
 
     // Grey level histogram
     std::vector<int> histogram(256);
@@ -59,18 +76,6 @@ namespace preprocess
       }
     }
 
-    // Binarize matrix
-    for (int i = 0; i < matrix.rows; ++i)
-    {
-      for (int j = 0; j < matrix.cols; ++j)
-      {
-        if (matrix.at<uchar>(i, j) < threshold)
-          newmatrix.at<uchar>(i, j) = 0;
-        else
-          newmatrix.at<uchar>(i, j) = 255;
-      }
-    }
-
-    return newmatrix;
+    return binarize(matrix, threshold);
   }
 } // namespace preprocess

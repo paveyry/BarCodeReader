@@ -4,7 +4,9 @@
 
 namespace preprocess
 {
+  cv::Mat binarize(const cv::Mat& matrix, int threshold);
+
   // Determine a threshold using Otsu's method and binarize the matrix
-  cv::Mat threshold(const cv::Mat& matrix);
+  cv::Mat threshold_otsu(const cv::Mat& matrix);
 }
 
