@@ -201,7 +201,9 @@ namespace detection
         extracted = misc::rotation90(extracted);
 
       // Reapply threshold (because we extracted a part of the grayscaled image)
-      extracted = preprocess::threshold_otsu(extracted);
+      int threshold_window = (extracted.cols / 12 % 2) ? extracted.cols / 12 : extracted.cols / 12 + 1;
+      cv::adaptiveThreshold(extracted, extracted, 255, CV_ADAPTIVE_THRESH_GAUSSIAN_C, CV_THRESH_BINARY,
+                            threshold_window , 5);
 
       cv::imwrite("test1.png", extracted);
       // Store the barcode

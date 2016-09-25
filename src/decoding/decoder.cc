@@ -14,34 +14,54 @@ namespace decoding
 
     for (auto& barcode : barcodes_)
     {
-      int unit_width = process_unit_width(barcode, barcode.rows / 3);
-      std::vector<int> bars = read_bars(barcode, unit_width, barcode.rows / 3);
+      std::unordered_map<std::string, int> occurrence_hist;
 
-      try
+      for (int r = 0; r < barcode.rows; ++r)
       {
-        std::vector<std::string> groups = group_bars(bars);
-
-
-        std::stringstream stringstream;
-
-        for (const auto& group : groups)
+        try
         {
-          std::cout << "Key: " << group << std::endl;
-          try
-          {
-            stringstream << std::to_string(values_.at(group));
-          } catch (std::out_of_range e) {
-            std::cout << e.what() << "\n";
-            continue;
-          }
-        }
+          int unit_width = process_unit_width(barcode, r);
+          std::vector<int> bars = read_bars(barcode, unit_width, r);
 
-        codes.push_back(stringstream.str());
+          std::vector<std::string> groups = group_bars(bars);
+
+          std::stringstream stringstream;
+
+          for (const auto& group : groups)
+          {
+            try
+            {
+              stringstream << std::to_string(values_.at(group));
+            } catch (std::out_of_range e)
+            {
+              break;
+            }
+          }
+
+          std::string code = stringstream.str();
+          if (code.size() < 12)
+            continue;
+
+          if (occurrence_hist.count(code))
+            ++occurrence_hist[code];
+          else
+            occurrence_hist[code] = 1;
+
+          std::cerr << code << std::endl;
+        }
+        catch (std::runtime_error e)
+        {
+          continue;
+        }
       }
-      catch (std::runtime_error e)
-      {
-        std::cerr << e.what() << "\n";
-      }
+
+      std::pair<std::string, int> best{"COULD NOT DECODE!", 0};
+      for (auto it = occurrence_hist.cbegin(); it != occurrence_hist.cend(); ++it)
+        if (it->second > best.second)
+          best = *it;
+
+      codes.push_back(best.first);
+
     }
     return codes;
   }
@@ -54,16 +74,16 @@ namespace decoding
 
     int i = 0;
 
-    while (barcode.at<uchar>(row, i) == 255)
+    while (i < barcode.cols && barcode.at<uchar>(row, i) == 255)
       ++i;
 
-    for (; barcode.at<uchar>(row, i) == 0; ++i)
+    for (; i < barcode.cols && barcode.at<uchar>(row, i) == 0; ++i)
       ++first_bar_width;
 
-    for (; barcode.at<uchar>(row, i) == 255; ++i)
+    for (; i < barcode.cols && barcode.at<uchar>(row, i) == 255; ++i)
       ++second_bar_width;
 
-    for (; barcode.at<uchar>(row, i) == 0; ++i)
+    for (; i < barcode.cols && barcode.at<uchar>(row, i) == 0; ++i)
       ++third_bar_width;
 
     return static_cast<int>(std::round((first_bar_width + second_bar_width + third_bar_width) / 3.f));
@@ -76,7 +96,7 @@ namespace decoding
     std::vector<int> result;
 
     int i = 0;
-    while (barcode.at<uchar>(row, i))
+    while (i < barcode.cols && barcode.at<uchar>(row, i))
       ++i;
 
     for (; i < barcode.cols; ++i)
